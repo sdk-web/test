@@ -1,1 +1,179 @@
-ㅎㅇ
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Showcase - Prototype</title>
+    <!-- Google Fonts: Inter for a clean, modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for a refined light theme */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light background, slate-50 */
+            color: #1e293b; /* Dark text for contrast, slate-800 */
+        }
+        /* Custom scrollbar for a cleaner look (optional, but cool) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0; /* slate-200 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* slate-400 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* slate-500 */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+    <!-- Header Section -->
+    <header class="py-6 px-4 sm:px-6 lg:px-8 bg-white shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-center">
+            <a href="#" class="text-4xl font-extrabold text-indigo-600 hover:text-indigo-700 transition-colors duration-300 tracking-tight">
+                PROTOTYPE STORE
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Search Bar Section -->
+        <section class="mb-12">
+            <div class="max-w-3xl mx-auto flex flex-col sm:flex-row gap-4">
+                <input 
+                    type="text" 
+                    id="search-input"
+                    placeholder="Search for products, categories, brands..." 
+                    class="flex-grow p-3 border border-gray-300 rounded-xl shadow-sm 
+                           focus:outline-none focus:ring-3 focus:ring-indigo-400 focus:border-transparent 
+                           transition-all duration-200 text-gray-700 text-lg" 
+                    aria-label="Search input"
+                >
+                <button 
+                    id="search-button"
+                    class="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-lg 
+                           hover:bg-indigo-700 focus:outline-none focus:ring-3 focus:ring-indigo-400 focus:ring-offset-2 
+                           transition-all duration-200 text-lg"
+                >
+                    Search
+                </button>
+            </div>
+        </section>
+
+        <!-- Product Listing Section -->
+        <section>
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Discover Our Latest Collection</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Product Card 1 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group">
+                    <img src="https://images.unsplash.com/photo-1542291026-79eddc9cdfd2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxzbmVha2VyfGVufDB8fHx8MTcwMDQ1NjQ1Nnww&ixlib=rb-4.0.3&q=80&w=400" alt="Stylish Sneakers" class="w-full h-56 object-cover group-hover:opacity-90 transition-opacity duration-300">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors duration-300">Urban Glide Sneakers</h3>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-3 py-1 rounded-full">Footwear</span>
+                            <span class="bg-green-100 text-green-800 text-xs font-medium px-3 py-1 rounded-full">New Arrival</span>
+                        </div>
+                        <p class="text-gray-700 text-2xl font-extrabold mb-4">$150.00</p>
+                        <button class="w-full bg-indigo-500 text-white py-3 rounded-lg font-semibold hover:bg-indigo-600 transition-colors duration-200 shadow-md">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 2 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group">
+                    <img src="https://images.unsplash.com/photo-1523275335684-c6216e217719?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxwcm9kdWN0fGVufDB8fHx8MTcwMDQ1NjQ1Nnww&ixlib=rb-4.0.3&q=80&w=400" alt="Minimalist Watch" class="w-full h-56 object-cover group-hover:opacity-90 transition-opacity duration-300">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors duration-300">Elegant Chrono Watch</h3>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-purple-100 text-purple-800 text-xs font-medium px-3 py-1 rounded-full">Accessories</span>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1 rounded-full">Limited Edition</span>
+                        </div>
+                        <p class="text-gray-700 text-2xl font-extrabold mb-4">$220.00</p>
+                        <button class="w-full bg-indigo-500 text-white py-3 rounded-lg font-semibold hover:bg-indigo-600 transition-colors duration-200 shadow-md">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 3 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06f2e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxoZWFkcGhvbmVzfGVufDB8fHx8MTcwMDQ1NjQ1Nnww&ixlib=rb-4.0.3&q=80&w=400" alt="Wireless Headphones" class="w-full h-56 object-cover group-hover:opacity-90 transition-opacity duration-300">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors duration-300">AeroSound Headphones</h3>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-full">Electronics</span>
+                            <span class="bg-red-100 text-red-800 text-xs font-medium px-3 py-1 rounded-full">Bestseller</span>
+                        </div>
+                        <p class="text-gray-700 text-2xl font-extrabold mb-4">$180.00</p>
+                        <button class="w-full bg-indigo-500 text-white py-3 rounded-lg font-semibold hover:bg-indigo-600 transition-colors duration-200 shadow-md">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 4 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer group">
+                    <img src="https://images.unsplash.com/photo-1585386959984-a415d0680a07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxtdWd8ZW58MHx8fHwxNzAwNDU2NDU2fDA&ixlib=rb-4.0.3&q=80&w=400" alt="Ceramic Coffee Mug" class="w-full h-56 object-cover group-hover:opacity-90 transition-opacity duration-300">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors duration-300">Artisan Coffee Mug</h3>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-orange-100 text-orange-800 text-xs font-medium px-3 py-1 rounded-full">Home Goods</span>
+                            <span class="bg-gray-100 text-gray-800 text-xs font-medium px-3 py-1 rounded-full">Handmade</span>
+                        </div>
+                        <p class="text-gray-700 text-2xl font-extrabold mb-4">$25.00</p>
+                        <button class="w-full bg-indigo-500 text-white py-3 rounded-lg font-semibold hover:bg-indigo-600 transition-colors duration-200 shadow-md">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="py-8 px-4 sm:px-6 lg:px-8 bg-gray-900 text-white mt-12">
+        <div class="max-w-7xl mx-auto text-center text-gray-400">
+            <p class="text-lg mb-2">&copy; 2023 Prototype Store. All rights reserved.</p>
+            <p class="text-sm">Crafted with <span class="text-red-500 animate-pulse">&hearts;</span> by Your Cool Designer</p>
+            <div class="flex justify-center space-x-4 mt-4">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy</a>
+                <span class="text-gray-600">|</span>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for interactivity -->
+    <script type="module">
+        // Handle search button click
+        document.getElementById('search-button').addEventListener('click', () => {
+            const searchTerm = document.getElementById('search-input').value.trim();
+            if (searchTerm) {
+                alert(`Searching for: "${searchTerm}"`);
+            } else {
+                alert('Please enter a search term to find products!');
+            }
+        });
+
+        // Handle product card clicks (simulating navigation to product details)
+        document.querySelectorAll('.group').forEach(card => {
+            card.addEventListener('click', (event) => {
+                // Prevent button click from triggering card click twice
+                if (event.target.tagName === 'BUTTON') {
+                    return;
+                }
+                const productName = card.querySelector('h3').textContent;
+                alert(`You've selected "${productName}". Imagine this takes you to a detailed product page!`);
+            });
+        });
+    </script>
+</body>
+</html>
