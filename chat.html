@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 채팅방</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Socket.IO 클라이언트 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .chat-container {
+            height: calc(100vh - 2rem);
+        }
+        .message-bubble {
+            animation: fadeInUp 0.3s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .typing-indicator {
+            animation: pulse 1.5s infinite;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+    <!-- 로그인 모달 -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">채팅방 입장</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">닉네임</label>
+                    <input type="text" id="username" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                           placeholder="닉네임을 입력하세요">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">아바타 선택</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <input type="radio" name="avatar" value="👨‍💻" id="avatar1" class="hidden" checked>
+                        <label for="avatar1" class="cursor-pointer text-2xl p-2 border-2 border-gray-200 rounded-lg hover:border-indigo-500 transition-colors">👨‍💻</label>
+                        
+                        <input type="radio" name="avatar" value="👩‍💻" id="avatar2" class="hidden">
+                        <label for="avatar2" class="cursor-pointer text-2xl p-2 border-2 border-gray-200 rounded-lg hover:border-indigo-500 transition-colors">👩‍💻</label>
+                        
+                        <input type="radio" name="avatar" value="🐱" id="avatar3" class="hidden">
+                        <label for="avatar3" class="cursor-pointer text-2xl p-2 border-2 border-gray-200 rounded-lg hover:border-indigo-500 transition-colors">🐱</label>
+                        
+                        <input type="radio" name="avatar" value="🐶" id="avatar4" class="hidden">
+                        <label for="avatar4" class="cursor-pointer text-2xl p-2 border-2 border-gray-200 rounded-lg hover:border-indigo-500 transition-colors">🐶</label>
+                    </div>
+                </div>
+                <button type="submit" 
+                        class="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors duration-200">
+                    채팅방 입장하기
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 채팅 인터페이스 -->
+    <div id="chatInterface" class="hidden chat-container">
+        <div class="bg-white rounded-2xl shadow-2xl h-full flex flex-col">
+            <!-- 헤더 -->
+            <div class="bg-indigo-600 text-white p-4 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <h1 class="text-xl font-bold">💬 실시간 채팅방</h1>
+                        <span id="userCount" class="bg-indigo-500 px-2 py-1 rounded-full text-sm">0명</span>
+                    </div>
+                    <button id="leaveChat" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors duration-200">
+                        나가기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 메인 콘텐츠 -->
+            <div class="flex-1 flex">
+                <!-- 채팅 영역 -->
+                <div class="flex-1 flex flex-col">
+                    <!-- 메시지 영역 -->
+                    <div id="messages" class="flex-1 p-4 overflow-y-auto scrollbar-thin space-y-4">
+                        <div class="text-center text-gray-500 text-sm">
+                            채팅방에 오신 것을 환영합니다! 👋
+                        </div>
+                    </div>
+
+                    <!-- 타이핑 표시 -->
+                    <div id="typingIndicator" class="hidden px-4 py-2 text-sm text-gray-500 italic">
+                        <span id="typingUsers"></span>이(가) 메시지를 입력 중입니다...
+                    </div>
+
+                    <!-- 메시지 입력 -->
+                    <div class="p-4 border-t border-gray-200">
+                        <form id="messageForm" class="flex space-x-2">
+                            <input type="text" id="messageInput" 
+                                   class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                   placeholder="메시지를 입력하세요..." maxlength="500">
+                            <button type="submit" 
+                                    class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors duration-200">
+                                전송
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 접속자 목록 -->
+                <div class="w-64 border-l border-gray-200 bg-gray-50">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-gray-800">접속자 목록</h3>
+                    </div>
+                    <div id="userList" class="p-4 space-y-2">
+                        <!-- 접속자들이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Socket.IO 연결
+        const socket = io();
+        let currentUser = null;
+        let typingTimeout = null;
+
+        // DOM 요소들
+        const loginModal = document.getElementById('loginModal');
+        const chatInterface = document.getElementById('chatInterface');
+        const loginForm = document.getElementById('loginForm');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const messagesContainer = document.getElementById('messages');
+        const userList = document.getElementById('userList');
+        const userCount = document.getElementById('userCount');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const typingUsers = document.getElementById('typingUsers');
+        const leaveChatBtn = document.getElementById('leaveChat');
+
+        // 로그인 처리
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const avatar = document.querySelector('input[name="avatar"]:checked').value;
+            
+            if (username) {
+                currentUser = { username, avatar };
+                socket.emit('join', currentUser);
+                loginModal.classList.add('hidden');
+                chatInterface.classList.remove('hidden');
+                messageInput.focus();
+            }
+        });
+
+        // 메시지 전송
+        messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (message) {
+                socket.emit('sendMessage', { message });
+                messageInput.value = '';
+                socket.emit('typing', false);
+            }
+        });
+
+        // 타이핑 이벤트
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing', true);
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit('typing', false);
+            }, 1000);
+        });
+
+        // 나가기 버튼
+        leaveChatBtn.addEventListener('click', () => {
+            if (confirm('정말로 채팅방을 나가시겠습니까?')) {
+                window.location.reload();
+            }
+        });
+
+        // 메시지 추가 함수
+        function addMessage(data, type = 'message') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message-bubble';
+            
+            if (type === 'system') {
+                messageDiv.innerHTML = `
+                    <div class="text-center">
+                        <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">
+                            ${data.message}
+                        </span>
+                        <div class="text-xs text-gray-400 mt-1">${data.timestamp}</div>
+                    </div>
+                `;
+            } else {
+                const isOwnMessage = data.id === socket.id;
+                messageDiv.innerHTML = `
+                    <div class="flex ${isOwnMessage ? 'justify-end' : 'justify-start'}">
+                        <div class="max-w-xs lg:max-w-md">
+                            <div class="flex items-end space-x-2 ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}">
+                                <div class="text-2xl">${data.avatar}</div>
+                                <div class="flex flex-col ${isOwnMessage ? 'items-end' : 'items-start'}">
+                                    <div class="text-xs text-gray-500 mb-1">${data.username}</div>
+                                    <div class="bg-${isOwnMessage ? 'indigo' : 'gray'}-500 text-white px-4 py-2 rounded-2xl ${isOwnMessage ? 'rounded-br-md' : 'rounded-bl-md'}">
+                                        ${data.message}
+                                    </div>
+                                    <div class="text-xs text-gray-400 mt-1">${data.timestamp}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 접속자 목록 업데이트
+        function updateUserList(users) {
+            userList.innerHTML = '';
+            userCount.textContent = `${users.length}명`;
+            
+            users.forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100';
+                userDiv.innerHTML = `
+                    <div class="text-xl">${user.avatar}</div>
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-800">${user.username}</div>
+                        <div class="text-xs text-green-500">● 온라인</div>
+                    </div>
+                `;
+                userList.appendChild(userDiv);
+            });
+        }
+
+        // Socket.IO 이벤트 리스너
+        socket.on('userJoined', (data) => {
+            addMessage(data, 'system');
+        });
+
+        socket.on('userLeft', (data) => {
+            addMessage(data, 'system');
+        });
+
+        socket.on('newMessage', (data) => {
+            addMessage(data);
+        });
+
+        socket.on('userList', (users) => {
+            updateUserList(users);
+        });
+
+        socket.on('userTyping', (data) => {
+            if (data.isTyping) {
+                typingUsers.textContent = data.username;
+                typingIndicator.classList.remove('hidden');
+            } else {
+                typingIndicator.classList.add('hidden');
+            }
+        });
+
+        // 연결 상태 표시
+        socket.on('connect', () => {
+            console.log('서버에 연결되었습니다.');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('서버와의 연결이 끊어졌습니다.');
+        });
+    </script>
+</body>
+</html> 
